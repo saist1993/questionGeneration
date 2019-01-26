@@ -69,14 +69,14 @@ def load_emebedding_matrix_file(preprocess_opt):
     return embeddings_index
 
 
-def create_emebdding_matrix(len_special_tokens,preprocess_opt,special_token_opt,vocab,unique_token=True):
+def create_emebdding_matrix(len_special_tokens,preprocess_opt,special_token_opt,vocab,embeddings_index,unique_token=True):
 
-    embeddings_index = load_emebedding_matrix_file(preprocess_opt)
+
     embedding_matrix = np.zeros((len(vocab) + len_special_tokens, preprocess_opt.dim))
 
     #adding special token in the dictionary
 
-    for word, i in tqdm(enumerate(vocab)):
+    for i, word in tqdm(enumerate(vocab)):
         if word == special_token_opt.unknown:
             embedding_matrix[i] = np.zeros(preprocess_opt.dim)
         elif word == special_token_opt.start:
@@ -144,11 +144,12 @@ def main():
 
     if preprocess_opt.ReturnEmbeddingMatrix:
         #Still need to check this part of the code
-
+        embeddings_index = load_emebedding_matrix_file(preprocess_opt)
         embedding_matrix = create_emebdding_matrix(len_special_tokens=special_token_length,
                                                    preprocess_opt=preprocess_opt,
                                                    special_token_opt=special_token_opt,
                                                    vocab=global_vocab,
+                                                   embeddings_index = embeddings_index,
                                                unique_token=preprocess_opt.UniqueToken)
         #Embedding would be stored as torch tensor
         #Might need to change format
