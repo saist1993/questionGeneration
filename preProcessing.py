@@ -99,7 +99,7 @@ def create_emebdding_matrix(len_special_tokens,preprocess_opt,special_token_opt,
     return embedding_matrix
 
 
-def main(return_embedding_matrix=False):
+def main():
 
     #global vocab only contains special tokens
     global global_vocab
@@ -142,7 +142,7 @@ def main(return_embedding_matrix=False):
         create an embedding file
     '''
 
-    if return_embedding_matrix:
+    if preprocess_opt.ReturnEmbeddingMatrix:
         #Still need to check this part of the code
 
         embedding_matrix = create_emebdding_matrix(len_special_tokens=special_token_length,

@@ -25,6 +25,7 @@ class OptionsPreProcess():
     EmbeddingMatrixLocation = 'data/glove.42B.300d.txt'
     dim = 300
     UniqueToken = True
+    ReturnEmbeddingMatrix = True
     SaveLocations = 'data/preProcess/'
     ValidSave = SaveLocations+'valid.pt'
     TrainSave = SaveLocations+'train.pt'
