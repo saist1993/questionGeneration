@@ -7,5 +7,7 @@ git clone https://github.com/OpenNMT/OpenNMT-py.git -q
 echo "changing the name of the OpenNMT-py to OpenNMT"
 mv OpenNMT-py OpenNMT
 
+touch OpenNMT/__init__.py
+
 
 

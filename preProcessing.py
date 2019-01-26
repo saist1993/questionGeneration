@@ -54,6 +54,7 @@ def tokenize_updated_vocab(text):
     global_vocab = list(set(global_vocab + tokens))
     return tokens
 
+
 def load_emebedding_matrix_file(preprocess_opt):
     f = open(preprocess_opt.EmbeddingMatrixLocation)
     embeddings_index = {}
@@ -68,14 +69,14 @@ def load_emebedding_matrix_file(preprocess_opt):
     return embeddings_index
 
 
-def create_emebdding_matrix(len_special_tokens,preprocess_opt,special_token_opt,unique_token=True):
+def create_emebdding_matrix(len_special_tokens,preprocess_opt,special_token_opt,vocab,unique_token=True):
 
     embeddings_index = load_emebedding_matrix_file(preprocess_opt)
-    embedding_matrix = np.zeros((len(global_vocab) + len_special_tokens, preprocess_opt.dim))
+    embedding_matrix = np.zeros((len(vocab) + len_special_tokens, preprocess_opt.dim))
 
     #adding special token in the dictionary
 
-    for word, i in tqdm(enumerate(global_vocab)):
+    for word, i in tqdm(enumerate(vocab)):
         if word == special_token_opt.unknown:
             embedding_matrix[i] = np.zeros(preprocess_opt.dim)
         elif word == special_token_opt.start:
@@ -94,7 +95,6 @@ def create_emebdding_matrix(len_special_tokens,preprocess_opt,special_token_opt,
                     embedding_matrix[i] = np.random.rand(preprocess_opt.dim)
                 else:
                     embedding_matrix[i] = np.zeros(preprocess_opt.dim)
-
     embeddings_index = None
     return embedding_matrix
 
@@ -102,6 +102,7 @@ def create_emebdding_matrix(len_special_tokens,preprocess_opt,special_token_opt,
 def main(return_embedding_matrix=False):
 
     #global vocab only contains special tokens
+    global global_vocab
     special_token_length = len(global_vocab)
     nlutils.create_dir(preprocess_opt.SaveLocations)
     dataset = json.load(open(preprocess_opt.LCQuADLocation))
@@ -122,6 +123,16 @@ def main(return_embedding_matrix=False):
     pair = [(tokenize_updated_vocab(d['verbalized_question'].replace('<', '').replace('>', '').replace('?', '')),
              tokenize_updated_vocab(d['corrected_question'].replace('?', ''))) for d in tqdm(dataset)]
 
+
+    '''
+        There is a bug in the code. This assumes ordering already while inserting.
+    '''
+
+    global_vocab.insert(special_token_opt.padIndex,special_token_opt.pad)
+    global_vocab.insert(special_token_opt.unknownIndex, special_token_opt.unknown)
+    global_vocab.insert(special_token_opt.startIndex, special_token_opt.start)
+    global_vocab.insert(special_token_opt.endIndex, special_token_opt.end)
+
     train_pair, val_pair, test_pair = \
         pair[:int(len(pair) * .80)], pair[int(len(pair) * .80):int(len(pair) * .90)], pair[int(len(pair) * .90):]
 
@@ -137,6 +148,7 @@ def main(return_embedding_matrix=False):
         embedding_matrix = create_emebdding_matrix(len_special_tokens=special_token_length,
                                                    preprocess_opt=preprocess_opt,
                                                    special_token_opt=special_token_opt,
+                                                   vocab=global_vocab,
                                                unique_token=preprocess_opt.UniqueToken)
         np.save(preprocess_opt.EmbeddingSave,embedding_matrix)
     #Now save them at appropriate location
@@ -195,21 +207,23 @@ if __name__ == '__main__':
 
     preprocess_opt = options.OptionsPreProcess()
     special_token_opt = options.OptionsSpecialToke()
-    global_vocab.append(special_token_opt.pad)
-    global_vocab.append(special_token_opt.unknown)
-    global_vocab.append(special_token_opt.start)
-    global_vocab.append(special_token_opt.end)
 
-    #pad id needs to be zero for easier retrival
-    assert global_vocab[0] == special_token_opt.pad
+
+
 
 
     '''
         In this word embedding schema we are assigning a 
             random vector to each token which does not exists in embedding file
             also unk - 0's
-                <s> - 
-                </s> - 
+                <s> - 1
+                </s> - -1
     
     '''
     main()
+
+    #pad id needs to be zero for easier retrival
+    assert global_vocab[special_token_opt.padIndex] == special_token_opt.pad
+    assert global_vocab[special_token_opt.unknownIndex] == special_token_opt.unknown
+    assert global_vocab[special_token_opt.endIndex] == special_token_opt.end
+    assert global_vocab[special_token_opt.startIndex] == special_token_opt.start

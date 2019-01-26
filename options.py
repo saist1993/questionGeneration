@@ -1,7 +1,7 @@
 '''
     Some options to set things up. Reset to more fine grained control later
 '''
-class Options():
+class ModelOptions():
     batch_size = 64
     valid_batch_size = 64
     batch_type = 'tokens'
@@ -31,9 +31,15 @@ class OptionsPreProcess():
     TestSave = SaveLocations+'test.pt'
     VocabSave = SaveLocations+'vocab.pt'
     EmbeddingSave = SaveLocations+'emb.pt'
+    FileSuffix = '.npy'
+    MaxSeqLen = 25
 
 class OptionsSpecialToke():
     unknown = '<unk>'
+    unknownIndex = 1
     start = '<s>'
+    startIndex = 2
     end = '</s>'
+    endIndex = 3
     pad = '<pad>'
+    padIndex = 0

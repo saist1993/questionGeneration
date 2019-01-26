@@ -1,8 +1,10 @@
 import torch
-import torch.nn as nn
-import numpy as np
-from functools import partial
 import OpenNMT
+import utils.tensor_utils as tu
+
+import sys
+
+sys.path.append('OpenNMT')
 
 class CustomEncoder(OpenNMT.onmt.encoders.rnn_encoder.RNNEncoder):
     """ A generic recurrent neural network encoder.
@@ -96,7 +98,7 @@ class CustomEncoder(OpenNMT.onmt.encoders.rnn_encoder.RNNEncoder):
         x = self.embeddings(src)
         # get sorted v
         #         print(x.shape)
-        lengths = mask.eq(self.padding_idx).long().sum(1)
+        lengths = mask.eq(1).long().sum(1)
         lengths_sort, idx_sort = torch.sort(lengths, dim=0, descending=True)
         _, idx_unsort = torch.sort(idx_sort, dim=0)
 
