@@ -16,7 +16,7 @@ sys.path.append('OpenNMT')
 
 
 # External Libraries
-import json,os,spacy
+import json,os,spacy,torch
 from tqdm import tqdm
 import numpy as np
 
@@ -150,7 +150,10 @@ def main(return_embedding_matrix=False):
                                                    special_token_opt=special_token_opt,
                                                    vocab=global_vocab,
                                                unique_token=preprocess_opt.UniqueToken)
-        np.save(preprocess_opt.EmbeddingSave,embedding_matrix)
+        #Embedding would be stored as torch tensor
+        #Might need to change format
+        embedding_matrix = torch.Tensor(embedding_matrix)
+        torch.save(preprocess_opt.EmbeddingSave,embedding_matrix)
     #Now save them at appropriate location
     np.save(preprocess_opt.TrainSave,train_pair)
     np.save(preprocess_opt.ValidSave,val_pair)
