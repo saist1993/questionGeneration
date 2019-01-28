@@ -154,7 +154,7 @@ def main():
         #Embedding would be stored as torch tensor
         #Might need to change format
         embedding_matrix = torch.Tensor(embedding_matrix)
-        torch.save(preprocess_opt.EmbeddingSave,embedding_matrix)
+        torch.save(embedding_matrix,preprocess_opt.EmbeddingSave)
     #Now save them at appropriate location
     np.save(preprocess_opt.TrainSave,train_pair)
     np.save(preprocess_opt.ValidSave,val_pair)
